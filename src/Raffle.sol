@@ -128,7 +128,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
     }
 
     // 1. Get a random number
-    // 2. Use random number to pick a palyer
+    // 2. Use random number to pick a player
     // 3. Be automatically called
     function performUpkeep(bytes calldata /* performData */) external {
         // check to see if enough time has passed
@@ -140,9 +140,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
                 uint256(s_raffleState)
             );
         }
-        if ((block.timestamp - s_lastTimeStamp) > i_interval) {
-            revert();
-        }
+
         s_raffleState = RaffleState.CALCULATING;
         VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient
             .RandomWordsRequest({
