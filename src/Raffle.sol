@@ -115,7 +115,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
      * @return upkeepNeeded - true if it's time to restart the lottery
      * @return - ignored
      */
-    function checkUpKeep(
+    function checkUpkeep(
         bytes memory /* checkData */
     ) public view returns (bool upkeepNeeded, bytes memory /* performData */) {
         bool timeHasPassed = ((block.timestamp - s_lastTimeStamp) >=
@@ -132,7 +132,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
     // 3. Be automatically called
     function performUpkeep(bytes calldata /* performData */) external {
         // check to see if enough time has passed
-        (bool upkeepNeeded, ) = checkUpKeep("");
+        (bool upkeepNeeded, ) = checkUpkeep("");
         if (!upkeepNeeded) {
             revert Raffle__UpkeepNotNeeded(
                 address(this).balance,
