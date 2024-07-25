@@ -6,6 +6,7 @@ import {DeployRaffle} from "../../script/DeployRaffle.s.sol";
 import {Raffle} from "../../src/Raffle.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
 import {Vm} from "forge-std/Vm.sol";
+import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
 
 contract RaffleTestis is Test {
     Raffle public raffle;
@@ -194,12 +195,26 @@ contract RaffleTestis is Test {
         // Act
         vm.recordLogs();
         raffle.performUpkeep("");
-        Vm.log[] memory entries = vm.getRecordedLogs();
+        Vm.Log[] memory entries = vm.getRecordedLogs();
         bytes32 requestId = entries[1].topics[1]; // first log to get emitted is from vrf itself, entries[0]. The 0th topic topic[0] always reserved for smth else
 
         // Assert
         Raffle.RaffleState raffleState = raffle.getRaffleState();
         assert(uint256(requestId) > 0); // making sure there's a requestId that is not blank
         assert(uint256(raffleState) == 1);
+    }
+
+    /*////////////////////////////////////////////////////
+    //                   FULFILLRANDOMWORDS            //
+    //////////////////////////////////////////////////*/
+    function testFulfillrandomWordsCanOnlyBeCalledAfterPerformUpkeep(
+        uint256 randomRequestId
+    ) public raffleEntered {
+        // Arrange / Act / Assert
+        vm.expectRevert(VRFCoordinatorV2_5Mock.InvalidRequest.selector);
+        VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(
+            randomRequestId,
+            address(raffle)
+        );
     }
 }
